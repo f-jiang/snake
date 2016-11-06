@@ -3,6 +3,8 @@
 
 #include <stddef.h>
 
+typedef enum direction_t { LEFT, RIGHT, UP, DOWN } Direction;
+
 // struct should be defined in .h not in .c
 // so other .c files can "see" the struct def
 typedef struct snake_t {
@@ -17,5 +19,8 @@ typedef struct food_t {
 
 Snake *snake_init(int x, int y);
 Food *food_init(int x, int y);
+
+void snake_eat(Snake *s);
+void snake_move(Snake *s, Direction d);
 
 #endif

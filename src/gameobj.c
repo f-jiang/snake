@@ -23,3 +23,15 @@ Food *food_init(int x, int y) {
     return f;
 }
 
+static void snake_grow(Snake *s) {
+
+}
+
+void snake_eat(Snake *s) {
+
+}
+
+void snake_move(Snake *s, Direction d) {
+
+}
+
