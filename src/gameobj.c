@@ -31,6 +31,18 @@ Food *food_init(int x, int y) {
     return f;
 }
 
+void snake_del(Snake **s) {
+    free((*s)->x);
+    free((*s)->y);
+    free(*s);
+    *s = NULL;
+}
+
+void food_del(Food **f) {
+    free(*f);
+    *f = NULL;
+}
+
 // can only grow once per movement
 void snake_grow(Snake * const s) {
     s->len++;

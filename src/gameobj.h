@@ -18,6 +18,9 @@ typedef struct food_t {
 Snake *snake_init(int x, int y);
 Food *food_init(int x, int y);
 
+void snake_del(Snake **s);
+void food_del(Food **f);
+
 void snake_grow(Snake * const s);
 void snake_move(Snake * const s, int x, int y);
 
