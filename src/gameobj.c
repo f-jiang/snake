@@ -17,6 +17,7 @@ Snake *snake_init(int x, int y) {
     s->y = malloc(s->len * sizeof(*(s->y))); 
     s->head_x = s->x;
     s->head_y = s->y;
+    s->alive = true;
 
     s->x[0] = x;
     s->y[0] = y;
@@ -28,6 +29,7 @@ Food *food_init(int x, int y) {
     Food *f = malloc(sizeof(*f));
     f->x = x;
     f->y = y;
+    f->eaten = false;
     return f;
 }
 
