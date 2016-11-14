@@ -67,7 +67,7 @@ void snake_grow(Snake * const s) {
     }
 }
 
-void snake_move(Snake * const s, int x, int y) {
+void snake_move_to(Snake * const s, int x, int y) {
     int i = s->len - 1;
 
     for ( ; i > 0; i--) {

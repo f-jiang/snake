@@ -34,7 +34,7 @@ static void draw(int y, int x, char c) {
     mvwaddch(win, (WIN_HEIGHT - 1) - (y + 1), x + 1, c);
 }
 
-void view_init() {
+void view_init(void) {
     initscr();
     noecho();
     curs_set(0);
@@ -46,7 +46,7 @@ void view_init() {
     wrefresh(win);
 }
 
-void view_end() {
+void view_end(void) {
     delwin(win);
     endwin();
 }
@@ -83,7 +83,7 @@ void view_rm_f(Food *f) {
     fg.remove = true;
 }
 
-void view_update() {
+void view_update(void) {
     //mvwprintw(win, 0, 0, "cur len: %d   prev len: %d", sg.s->len, sg.s_prev.len);
     int i;
 

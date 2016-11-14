@@ -45,7 +45,7 @@ static int rand_int(int min, int max) {
     return rand() % (max - min) + min;
 }
 
-static void timer_update() {
+static void timer_update(void) {
     it_val.it_value.tv_sec = interval / 1000;
     it_val.it_value.tv_usec = (interval * 1000) % 1000000;
     it_val.it_interval = it_val.it_value;
@@ -100,7 +100,7 @@ static void loop(void) {
         f->eaten = true;
     }
 
-    snake_move(s, s_x, s_y);
+    snake_move_to(s, s_x, s_y);
     view_update();
     timer_update();
 
@@ -133,7 +133,7 @@ static void loop(void) {
         calculate new x, y based on dir from above:
             if edge of map, get opposite edge
 
-        snake_move(s, x, y)     // will have to modify implementation
+        snake_move_to(s, x, y)     // will have to modify implementation
 
         if food found (x y of snake equals x y of food):
             grow snake
