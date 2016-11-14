@@ -49,7 +49,15 @@ static void timer_update(void) {
     it_val.it_value.tv_sec = interval / 1000;
     it_val.it_value.tv_usec = (interval * 1000) % 1000000;
     it_val.it_interval = it_val.it_value;
+
     if (setitimer(ITIMER_REAL, &it_val, NULL) == -1) {
+      perror("error calling setitimer()");
+      exit(1);
+    }
+}
+
+static void timer_stop(void) {
+    if (setitimer(ITIMER_REAL, NULL, NULL) == -1) {
       perror("error calling setitimer()");
       exit(1);
     }
@@ -98,6 +106,8 @@ static void loop(void) {
         interval--;     // temp
         view_rm_f(f);
         f->eaten = true;
+    } else if (snake_touching(s, s_x, s_y)) {
+        s->alive = false;
     }
 
     snake_move_to(s, s_x, s_y);
@@ -192,6 +202,14 @@ int main(int argc, char *argv[]) {
 
         view_update();
     }
+
+    //timer_stop();
+
+    view_rm_s(s);
+    view_rm_f(f);
+
+    snake_del(&s);
+    food_del(&f);
 
     view_end();
     return 0;

@@ -26,6 +26,7 @@ void food_del(Food **f);
 
 void snake_grow(Snake * const s);
 void snake_move_to(Snake * const s, int x, int y);
+bool snake_touching(Snake * const s, int x, int y);
 
 #endif
 

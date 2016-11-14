@@ -79,3 +79,14 @@ void snake_move_to(Snake * const s, int x, int y) {
     s->y[0] = y;
 }
 
+bool snake_touching(Snake * const s, int x, int y) {
+    int i = 0;
+    for ( ; i < s->len; i++) {
+        if (x == s->x[i] && y == s->y[i]) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
