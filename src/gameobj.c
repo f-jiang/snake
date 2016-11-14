@@ -6,15 +6,15 @@
 // if realloc'ing s->x and s->y, would have to realloc entire struct as well
 // Snake *s = malloc(sizeof(*s) + 2 * sizeof(int));
 // s->len = 1;
-// 
+//
 // s->x = (int *) (s + 1);
 // s->y = (int *) (s + 1) + 1;
 Snake *snake_init(int x, int y) {
     Snake *s = malloc(sizeof(*s));
 
     s->len = 1;
-    s->x = malloc(s->len * sizeof(*(s->x))); 
-    s->y = malloc(s->len * sizeof(*(s->y))); 
+    s->x = malloc(s->len * sizeof(*(s->x)));
+    s->y = malloc(s->len * sizeof(*(s->y)));
     s->head_x = s->x;
     s->head_y = s->y;
     s->alive = true;
@@ -48,12 +48,18 @@ void food_del(Food **f) {
 // can only grow once per movement
 void snake_grow(Snake * const s) {
     s->len++;
-    int *x1 = realloc(s->x, s->len * sizeof(*x1)); 
-    int *y1 = realloc(s->y, s->len * sizeof(*y1)); 
+    int *x1 = realloc(s->x, s->len * sizeof(*x1));
+    int *y1 = realloc(s->y, s->len * sizeof(*y1));
 
     if (x1 && y1) {
         s->head_x = s->x = x1;
         s->head_y = s->y = y1;
+    } else if (!x1) {
+        s->len--;
+        free(x1);
+    } else if (!y1) {
+        s->len--;
+        free(y1);
     } else {
         s->len--;
         free(x1);
