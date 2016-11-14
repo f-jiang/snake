@@ -55,10 +55,10 @@ void view_add_s(Snake *s, char head, char body, char dhead, char dbody) {
     sg.s = s;
 
     sg.s_prev = *s;
-    sg.s_prev.x = malloc(sizeof(*(sg.s_prev.x) * sg.s_prev.len));
-    sg.s_prev.y = malloc(sizeof(*(sg.s_prev.y) * sg.s_prev.len));
-    memcpy(sg.s_prev.x, s->x, sizeof(*(sg.s_prev.x) * sg.s_prev.len));
-    memcpy(sg.s_prev.y, s->y, sizeof(*(sg.s_prev.y) * sg.s_prev.len));
+    sg.s_prev.x = malloc(sizeof(*(sg.s_prev.x)) * sg.s_prev.len);
+    sg.s_prev.y = malloc(sizeof(*(sg.s_prev.y)) * sg.s_prev.len);
+    memcpy(sg.s_prev.x, s->x, sizeof(*(sg.s_prev.x)) * sg.s_prev.len);
+    memcpy(sg.s_prev.y, s->y, sizeof(*(sg.s_prev.y)) * sg.s_prev.len);
     sg.s_prev.head_x = sg.s_prev.x;
     sg.s_prev.head_y = sg.s_prev.y;
 
