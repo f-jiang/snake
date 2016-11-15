@@ -119,45 +119,6 @@ static void loop(void) {
         f = food_init(rand() % MAP_WIDTH, rand() % MAP_HEIGHT);
         view_add_f(f, '$');
     }
-
-/*
-    loop:
-        if nofood is true:
-            if atefood true:
-                *clear* food
-                free(food);
-                atefood = false
-            *draw* food in random x, y
-            within bounds, not on snake or walls
-            ** on high difficulty, place close to snake
-            nofood = false
-
-        if gameover *draw* rekt snake and break
-        else *draw* normal snake
-
-        check for keyboard press:
-            take latest press as the one used
-            if dir changed, set new dir
-            else leave as is
-        sleep: decrease duration as difficulty increases
-        calculate new x, y based on dir from above:
-            if edge of map, get opposite edge
-
-        snake_move_to(s, x, y)     // will have to modify implementation
-
-        if food found (x y of snake equals x y of food):
-            grow snake
-            increase difficulty
-            *clear* current food in next loop (atefood = true)
-            *draw* new food in next loop (nofood = true)
-
-        if collide with self or wall:
-            snake dies
-            gameover = true
-
-    *clear snake and food*
-    *display* game over graphics
-*/
 }
 
 int main(int argc, char *argv[]) {
