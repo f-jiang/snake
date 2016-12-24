@@ -45,24 +45,6 @@ static int rand_int(int min, int max) {
     return rand() % (max - min) + min;
 }
 
-static void timer_update(void) {
-    it_val.it_value.tv_sec = interval / 1000;
-    it_val.it_value.tv_usec = (interval * 1000) % 1000000;
-    it_val.it_interval = it_val.it_value;
-
-    if (setitimer(ITIMER_REAL, &it_val, NULL) == -1) {
-      perror("error calling setitimer()");
-      exit(1);
-    }
-}
-
-static void timer_stop(void) {
-    if (setitimer(ITIMER_REAL, NULL, NULL) == -1) {
-      perror("error calling setitimer()");
-      exit(1);
-    }
-}
-
 static void loop(void) {
     if (dir == NONE) {
         dir = rand_int(0, 4);
@@ -99,6 +81,7 @@ static void loop(void) {
 
     dir_prev = dir;
 
+    snake_grow(s);
     if (s_x == f->x && s_y == f->y) {
         snake_grow(s);
         score++;        // temp
@@ -111,8 +94,8 @@ static void loop(void) {
     }
 
     snake_move_to(s, s_x, s_y);
+
     view_update();
-    timer_update();
 
     if (f->eaten) {
         food_del(&f);
@@ -121,15 +104,32 @@ static void loop(void) {
     }
 }
 
-int main(int argc, char *argv[]) {
-    MAP_WIDTH = 40;     // TODO init with command line args
-    MAP_HEIGHT = 40;
-
+static void loop_start(void) {
     if (signal(SIGALRM, (void (*)(int)) loop) == SIG_ERR) {
       perror("Unable to catch SIGALRM");
       exit(1);
     }
-    timer_update();
+
+    it_val.it_value.tv_sec = interval / 1000;
+    it_val.it_value.tv_usec = (interval * 1000) % 1000000;
+    it_val.it_interval = it_val.it_value;
+
+    if (setitimer(ITIMER_REAL, &it_val, NULL) == -1) {
+      perror("error calling setitimer()");
+      exit(1);
+    }
+}
+
+static void loop_stop(void) {
+    if (setitimer(ITIMER_REAL, NULL, NULL) == -1) {
+      perror("error calling setitimer()");
+      exit(1);
+    }
+}
+
+int main(int argc, char *argv[]) {
+    MAP_WIDTH = 40;     // TODO init with command line args
+    MAP_HEIGHT = 40;
 
     s_x = rand_int(0, MAP_WIDTH);
     s_y = rand_int(0, MAP_HEIGHT);
@@ -138,8 +138,11 @@ int main(int argc, char *argv[]) {
     view_init();
     view_add_s(s, 'o', '*', '^', 'x');
     view_add_f(f, '$');
-    view_update();
 
+    view_update();
+    loop_start();
+
+    timeout(0);
     keypad(stdscr, TRUE);
     int ch;
     while (s->alive) {
@@ -160,11 +163,12 @@ int main(int argc, char *argv[]) {
             default:
                 break;
         }
-
-        view_update();
     }
 
-    //timer_stop();
+    loop_stop();
+    view_print("Game over!");
+    view_update();
+    sleep(2);
 
     view_rm_s(s);
     view_rm_f(f);

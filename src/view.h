@@ -14,6 +14,7 @@ void view_add_f(Food *f, char look);
 void view_rm_s(Snake *s);
 void view_rm_f(Food *f);
 
+void view_print(char *str);
 void view_update(void);
 
 #endif

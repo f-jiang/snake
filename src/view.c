@@ -3,6 +3,7 @@
 #include <stdlib.h>     // malloc(), free()
 #include <stdbool.h>     // malloc(), free()
 #include <string.h>     // memcpy()
+#include <stddef.h>
 //#include <ncurses.h>  // temp
 #include "main.h"       // MAP_WIDTH, MAP_HEIGHT
 
@@ -83,35 +84,34 @@ void view_rm_f(Food *f) {
     fg.remove = true;
 }
 
+void view_print(char *str) {
+    size_t len = strlen(str);
+    mvwaddnstr(win, WIN_HEIGHT / 2, 0, "", WIN_WIDTH);
+    mvwaddnstr(win, WIN_HEIGHT / 2, (WIN_WIDTH - len) / 2, str, len);
+}
+
 void view_update(void) {
-    //mvwprintw(win, 0, 0, "cur len: %d   prev len: %d", sg.s->len, sg.s_prev.len);
     int i;
 
     if (fg.remove) {
         draw(fg.f->y, fg.f->x, ' ');
         fg.f = NULL;    // temp
         fg.remove = false;
-    } else {
+    } else if (fg.f) {
         draw(fg.f->y, fg.f->x, fg.f->eaten ? ' ' : fg.look);
     }
 
     for (i = 0; i < sg.s_prev.len; i++) {
-//        mvwprintw(win, i, 0, "\n                     ");
-//        mvwprintw(win, i, 0, "\r%d: %d %d", i + 1, sg.s_prev.x[i], sg.s_prev.y[i]);
         draw(sg.s_prev.y[i], sg.s_prev.x[i], ' ');
     }
 
     if (sg.remove) {
         sg.s = NULL;    // temp
         sg.remove = false;
-    } else {
+    } else if (sg.s) {
         if (sg.s->alive) {
-//            mvwprintw(win, 0, 0, "\n                     ");
-//            mvwprintw(win, 0, 0, "\r%d: %d %d", 1, sg.s->x[0], sg.s->y[0]);
             draw(*(sg.s->head_y), *(sg.s->head_x), sg.head);
             for (i = 1; i < sg.s->len; i++) {
-//                mvwprintw(win, i, 0, "\n                     ");
-//                mvwprintw(win, i, 0, "\r%d: %d %d", i + 1, sg.s->x[i], sg.s->y[i]);
                 draw(sg.s->y[i], sg.s->x[i], sg.body);
             }
         } else {
