@@ -1,5 +1,5 @@
 snake: main.o gameobj.o view.o
-	cc -o snake main.o gameobj.o view.o -lncurses
+	cc -o snake main.o gameobj.o view.o -lncurses -lm
 
 main.o: src/main.c
 	cc -c src/main.c

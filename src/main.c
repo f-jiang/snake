@@ -6,6 +6,7 @@
 #include <unistd.h>     /* for pause */
 #include <signal.h>     /* for signal */
 #include <stdlib.h>
+#include <math.h>
 
 #include "main.h"
 #include "gameobj.h"
@@ -23,11 +24,10 @@ int MAP_WIDTH;
 int MAP_HEIGHT;
 
 static struct itimerval it_val;
+static int score = 0;
 static int interval = 100;
 static Snake *s = NULL;
 static Food *f = NULL;
-static int difficulty = 0;
-static int score = 0;
 static enum direction_t dir = NONE;
 static enum direction_t dir_prev = NONE;
 static int s_x = 0;
@@ -43,6 +43,23 @@ static int rand_int(int min, int max) {
     }
 
     return rand() % (max - min) + min;
+}
+
+static void loop_update(void) {
+    interval = pow(2, -(score - 40) / 5.0) + 10;
+
+    char buffer[10];
+    sprintf(buffer, "%d", interval);
+    mvaddstr(0, 0, buffer);
+
+    it_val.it_value.tv_sec = interval / 1000;
+    it_val.it_value.tv_usec = (interval * 1000) % 1000000;
+    it_val.it_interval = it_val.it_value;
+
+    if (setitimer(ITIMER_REAL, &it_val, NULL) == -1) {
+      perror("error calling setitimer()");
+      exit(1);
+    }
 }
 
 static void loop(void) {
@@ -81,20 +98,20 @@ static void loop(void) {
 
     dir_prev = dir;
 
-    snake_grow(s);
     if (s_x == f->x && s_y == f->y) {
         snake_grow(s);
-        score++;        // temp
-        difficulty++;   // temp
-        interval--;     // temp
+        score++;
         view_rm_f(f);
         f->eaten = true;
+
+        loop_update();
     } else if (snake_touching(s, s_x, s_y)) {
         s->alive = false;
     }
 
     snake_move_to(s, s_x, s_y);
 
+    view_print_score(score);
     view_update();
 
     if (f->eaten) {
@@ -110,14 +127,7 @@ static void loop_start(void) {
       exit(1);
     }
 
-    it_val.it_value.tv_sec = interval / 1000;
-    it_val.it_value.tv_usec = (interval * 1000) % 1000000;
-    it_val.it_interval = it_val.it_value;
-
-    if (setitimer(ITIMER_REAL, &it_val, NULL) == -1) {
-      perror("error calling setitimer()");
-      exit(1);
-    }
+    loop_update();
 }
 
 static void loop_stop(void) {
@@ -166,7 +176,7 @@ int main(int argc, char *argv[]) {
     }
 
     loop_stop();
-    view_print("Game over!");
+    view_print_ctr("Game over!");
     view_update();
     sleep(2);
 

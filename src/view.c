@@ -84,7 +84,13 @@ void view_rm_f(Food *f) {
     fg.remove = true;
 }
 
-void view_print(char *str) {
+void view_print_score(int score) {
+    char buffer[5];
+    size_t len = sprintf(buffer, "%d", score);
+    mvwaddnstr(win, 0, WIN_WIDTH - len, buffer, len);
+}
+
+void view_print_ctr(char *str) {
     size_t len = strlen(str);
     mvwaddnstr(win, WIN_HEIGHT / 2, 0, "", WIN_WIDTH);
     mvwaddnstr(win, WIN_HEIGHT / 2, (WIN_WIDTH - len) / 2, str, len);
