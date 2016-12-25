@@ -10,8 +10,8 @@
 
 #define WIN_WIDTH        (MAP_WIDTH + 2)
 #define WIN_HEIGHT       (MAP_HEIGHT + 2)
-#define WIN_X            ((COLS - WIN_HEIGHT) / 2)
-#define WIN_Y            ((LINES - WIN_WIDTH) / 2)
+#define WIN_X            ((COLS - WIN_WIDTH) / 2)
+#define WIN_Y            ((LINES - WIN_HEIGHT) / 2)
 
 static struct s_graphics_t {
     const Snake *s;
@@ -165,6 +165,7 @@ void view_update(void) {
     if (new_msg) {
         new_msg = false;
 
+        // TODO dynamic string of length |prev_msg_len|
         mvwaddnstr(win, WIN_HEIGHT / 2, (WIN_WIDTH - prev_msg_len) / 2, "                                ", prev_msg_len);
 
         mvwaddnstr(win, WIN_HEIGHT / 2, (WIN_WIDTH - msg_len) / 2, msg, msg_len);

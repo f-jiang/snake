@@ -6,6 +6,7 @@
 #include <time.h>
 
 #include <ncurses.h>
+#include <sys/ioctl.h>
 #include <sys/time.h>   /* for setitimer */
 #include <unistd.h>     /* for pause */
 #include <signal.h>     /* for signal */
@@ -130,8 +131,11 @@ static void loop_stop(void) {
 }
 
 int main(int argc, char *argv[]) {
-    MAP_WIDTH = 40;     // TODO init with command line args
-    MAP_HEIGHT = 40;
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+    MAP_WIDTH = w.ws_col - 2;     // TODO init with command line args
+    MAP_HEIGHT = w.ws_row - 2;
 
     s_x = rand_int(0, MAP_WIDTH);
     s_y = rand_int(0, MAP_HEIGHT);
