@@ -1,14 +1,12 @@
 #include "view.h"
 
 #include <stdlib.h>     // malloc(), free()
-#include <stdbool.h>     // malloc(), free()
+#include <stdbool.h>
 #include <string.h>     // memcpy()
-#include <stddef.h>
-//#include <ncurses.h>  // temp
-#include "main.h"       // MAP_WIDTH, MAP_HEIGHT
+#include <stddef.h>     // size_t
+#include <ncurses.h>
 
-// TODO:
-// - add support for multiple |Snake| and |Food| objects
+#include "main.h"       // MAP_WIDTH, MAP_HEIGHT
 
 #define WIN_WIDTH        (MAP_WIDTH + 2)
 #define WIN_HEIGHT       (MAP_HEIGHT + 2)
@@ -29,10 +27,52 @@ static struct f_graphics_t {
     bool remove;
 } fg;
 
-/*static*/ WINDOW *win; // temp
+static WINDOW *win;
+
+static bool new_score, new_msg;
+static char *score, *msg;
+static size_t score_len, msg_len, prev_msg_len;
 
 static void draw(int y, int x, char c) {
     mvwaddch(win, (WIN_HEIGHT - 1) - (y + 1), x + 1, c);
+}
+
+static void snake_draw(const Snake *s, bool clear) {
+    char head, body;
+
+    if (clear) { 
+        head = body = ' ';
+    } else if (s->alive) {
+        head = sg.head;
+        body = sg.body;
+    } else {
+        head = sg.dhead;
+        body = sg.dbody;
+    }
+
+    draw(*(s->head_y), *(s->head_x), head);
+
+    int i;
+    for (i = 1; i < s->len; i++) {
+        draw(s->y[i], s->x[i], body);
+    }
+}
+
+static void food_draw(const Food *f, bool clear) {
+    draw(fg.f->y, fg.f->x, (fg.f->eaten || clear) ? ' ' : fg.look);
+}
+
+static void s_prev_update(const Snake *s) {
+    free(sg.s_prev.x);
+    free(sg.s_prev.y);
+
+    sg.s_prev = *s;
+    sg.s_prev.x = malloc(sizeof(*(sg.s_prev.x)) * sg.s_prev.len);
+    sg.s_prev.y = malloc(sizeof(*(sg.s_prev.y)) * sg.s_prev.len);
+    memcpy(sg.s_prev.x, s->x, sizeof(*(sg.s_prev.x)) * sg.s_prev.len);
+    memcpy(sg.s_prev.y, s->y, sizeof(*(sg.s_prev.y)) * sg.s_prev.len);
+    sg.s_prev.head_x = sg.s_prev.x;
+    sg.s_prev.head_y = sg.s_prev.y;
 }
 
 void view_init(void) {
@@ -55,13 +95,7 @@ void view_end(void) {
 void view_add_s(Snake *s, char head, char body, char dhead, char dbody) {
     sg.s = s;
 
-    sg.s_prev = *s;
-    sg.s_prev.x = malloc(sizeof(*(sg.s_prev.x)) * sg.s_prev.len);
-    sg.s_prev.y = malloc(sizeof(*(sg.s_prev.y)) * sg.s_prev.len);
-    memcpy(sg.s_prev.x, s->x, sizeof(*(sg.s_prev.x)) * sg.s_prev.len);
-    memcpy(sg.s_prev.y, s->y, sizeof(*(sg.s_prev.y)) * sg.s_prev.len);
-    sg.s_prev.head_x = sg.s_prev.x;
-    sg.s_prev.head_y = sg.s_prev.y;
+    s_prev_update(s);
 
     sg.head = head;
     sg.body = body;
@@ -84,58 +118,56 @@ void view_rm_f(Food *f) {
     fg.remove = true;
 }
 
-void view_print_score(int score) {
+void view_print_score(int val) {
     char buffer[5];
-    size_t len = sprintf(buffer, "%d", score);
-    mvwaddnstr(win, 0, WIN_WIDTH - len, buffer, len);
+    new_score = true;
+    score_len = sprintf(buffer, "%d", val);
+    score = buffer;
 }
 
 void view_print_ctr(char *str) {
-    size_t len = strlen(str);
-    mvwaddnstr(win, WIN_HEIGHT / 2, 0, "", WIN_WIDTH);
-    mvwaddnstr(win, WIN_HEIGHT / 2, (WIN_WIDTH - len) / 2, str, len);
+    new_msg = true;
+    prev_msg_len = msg_len;
+    msg_len = strlen(str);
+    msg = str;
 }
 
 void view_update(void) {
-    int i;
-
     if (fg.remove) {
-        draw(fg.f->y, fg.f->x, ' ');
-        fg.f = NULL;    // temp
+        food_draw(fg.f, true);
+
+        fg.f = NULL;
         fg.remove = false;
     } else if (fg.f) {
-        draw(fg.f->y, fg.f->x, fg.f->eaten ? ' ' : fg.look);
-    }
-
-    for (i = 0; i < sg.s_prev.len; i++) {
-        draw(sg.s_prev.y[i], sg.s_prev.x[i], ' ');
+        food_draw(fg.f, false);
     }
 
     if (sg.remove) {
-        sg.s = NULL;    // temp
-        sg.remove = false;
-    } else if (sg.s) {
-        if (sg.s->alive) {
-            draw(*(sg.s->head_y), *(sg.s->head_x), sg.head);
-            for (i = 1; i < sg.s->len; i++) {
-                draw(sg.s->y[i], sg.s->x[i], sg.body);
-            }
-        } else {
-            draw(*(sg.s->head_y), *(sg.s->head_x), sg.dhead);
-            for (i = 1; i < sg.s->len; i++) {
-                draw(sg.s->y[i], sg.s->x[i], sg.dbody);
-            }
-        }
+        snake_draw(sg.s, true);
 
         free(sg.s_prev.x);
         free(sg.s_prev.y);
-        sg.s_prev = *(sg.s);
-        sg.s_prev.x = malloc(sizeof(*(sg.s_prev.x)) * sg.s_prev.len);
-        sg.s_prev.y = malloc(sizeof(*(sg.s_prev.y)) * sg.s_prev.len);
-        memcpy(sg.s_prev.x, sg.s->x, sizeof(*(sg.s_prev.x)) * sg.s_prev.len);
-        memcpy(sg.s_prev.y, sg.s->y, sizeof(*(sg.s_prev.y)) * sg.s_prev.len);
-        sg.s_prev.head_x = sg.s_prev.x;
-        sg.s_prev.head_y = sg.s_prev.y;
+        sg.s = NULL;
+        sg.remove = false;
+    } else if (sg.s) {
+        snake_draw(&sg.s_prev, true);
+        snake_draw(sg.s, false);
+
+        s_prev_update(sg.s);
+    }
+
+//    if (new_score) {
+//        new_score = false;
+//        // BUG printing random chars instead of actual score
+//        mvwaddnstr(win, 0, WIN_WIDTH - score_len, score, score_len);
+//    }
+
+    if (new_msg) {
+        new_msg = false;
+
+        mvwaddnstr(win, WIN_HEIGHT / 2, (WIN_WIDTH - prev_msg_len) / 2, "                                ", prev_msg_len);
+
+        mvwaddnstr(win, WIN_HEIGHT / 2, (WIN_WIDTH - msg_len) / 2, msg, msg_len);
     }
 
     wrefresh(win);

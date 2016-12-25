@@ -4,8 +4,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-// struct should be defined in .h not in .c
-// so other .c files can "see" the struct def
 typedef struct snake_t {
     size_t len;
     int *x, *y;

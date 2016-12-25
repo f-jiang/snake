@@ -68,9 +68,9 @@ void snake_grow(Snake * const s) {
 }
 
 void snake_move_to(Snake * const s, int x, int y) {
-    int i = s->len - 1;
+    int i;
 
-    for ( ; i > 0; i--) {
+    for (i = s->len - 1; i > 0; i--) {
         s->x[i] = s->x[i - 1];
         s->y[i] = s->y[i - 1];
     }
@@ -80,8 +80,8 @@ void snake_move_to(Snake * const s, int x, int y) {
 }
 
 bool snake_touching(Snake * const s, int x, int y) {
-    int i = 0;
-    for ( ; i < s->len; i++) {
+    int i;
+    for (i = 0; i < s->len; i++) {
         if (x == s->x[i] && y == s->y[i]) {
             return true;
         }
