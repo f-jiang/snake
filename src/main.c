@@ -22,6 +22,8 @@ enum direction_t { UP, LEFT, RIGHT, DOWN, NONE };
 int MAP_WIDTH;
 int MAP_HEIGHT;
 
+static const int MAX_SIZE = 5;
+
 static Food *f = NULL;
 static Snake *s = NULL;
 static int s_x = 0;
@@ -131,11 +133,21 @@ static void loop_stop(void) {
 }
 
 int main(int argc, char *argv[]) {
+    int c = getopt(argc, argv, "s:");
+    int size;
+
+    if (c == 's') {
+        size = atoi(optarg);
+    }
+
+    if (c == -1 || size < 1 || size > MAX_SIZE) {
+        size = MAX_SIZE;    
+    }
+
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-
-    MAP_WIDTH = w.ws_col - 2;     // TODO init with command line args
-    MAP_HEIGHT = w.ws_row - 2;
+    MAP_WIDTH = size * (w.ws_col - 2) / MAX_SIZE;
+    MAP_HEIGHT = size * (w.ws_row - 2) / MAX_SIZE;
 
     s_x = rand_int(0, MAP_WIDTH);
     s_y = rand_int(0, MAP_HEIGHT);
