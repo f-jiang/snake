@@ -156,17 +156,19 @@ void view_update(void) {
         s_prev_update(sg.s);
     }
 
-//    if (new_score) {
-//        new_score = false;
-//        // BUG printing random chars instead of actual score
-//        mvwaddnstr(win, 0, WIN_WIDTH - score_len, score, score_len);
-//    }
+    if (new_score) {
+        new_score = false;
+        mvwaddnstr(win, 0, WIN_WIDTH - score_len, score, score_len);
+    }
 
     if (new_msg) {
         new_msg = false;
 
-        // TODO dynamic string of length |prev_msg_len|
-        mvwaddnstr(win, WIN_HEIGHT / 2, (WIN_WIDTH - prev_msg_len) / 2, "                                ", prev_msg_len);
+        size_t size = sizeof(char) * prev_msg_len;
+        char *blank = malloc(size);
+        memset(blank, ' ', size);
+        mvwaddnstr(win, WIN_HEIGHT / 2, (WIN_WIDTH - prev_msg_len) / 2, blank, prev_msg_len);
+        free(blank);
 
         mvwaddnstr(win, WIN_HEIGHT / 2, (WIN_WIDTH - msg_len) / 2, msg, msg_len);
     }
