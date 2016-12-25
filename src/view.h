@@ -17,3 +17,4 @@ void view_print_ctr(char *str);
 void view_update(void);
 
 #endif
+

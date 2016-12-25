@@ -227,3 +227,4 @@ int main(int argc, char *argv[]) {
     view_end();
     return EXIT_SUCCESS;
 }
+

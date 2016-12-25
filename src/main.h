@@ -6,3 +6,4 @@ int MAP_HEIGHT;
 char *PROGRAM_NAME;
 
 #endif
+
