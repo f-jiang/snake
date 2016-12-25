@@ -1,6 +1,6 @@
 # Snake
 
-
+![screenshot](https://raw.githubusercontent.com/f-jiang/snake/master/screenshot.png)
 
 ## Installing and Compiling on Linux
 
