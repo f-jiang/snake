@@ -3,5 +3,6 @@
 
 int MAP_WIDTH;
 int MAP_HEIGHT;
+char *PROGRAM_NAME;
 
 #endif

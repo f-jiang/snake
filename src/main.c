@@ -7,12 +7,14 @@
 
 #include <ncurses.h>
 #include <sys/ioctl.h>
-#include <sys/time.h>   /* for setitimer */
-#include <unistd.h>     /* for pause */
-#include <signal.h>     /* for signal */
+#include <sys/time.h>   // for setitimer
+#include <unistd.h>     // for pause
+#include <signal.h>     // for signal
 
 #include "gameobj.h"
 #include "view.h"
+
+#define SIZE_VALID  (size < 1 || size > MAX_SIZE)
 
 // 00, 01, 10, 11, 100
 // (UP ^ 0x03) == DOWN
@@ -21,9 +23,11 @@ enum direction_t { UP, LEFT, RIGHT, DOWN, NONE };
 
 int MAP_WIDTH;
 int MAP_HEIGHT;
+char *PROGRAM_NAME;
 
 static const int MAX_SIZE = 5;
 
+static int size = 0;
 static Food *f = NULL;
 static Snake *s = NULL;
 static int s_x = 0;
@@ -132,15 +136,32 @@ static void loop_stop(void) {
     }
 }
 
-int main(int argc, char *argv[]) {
-    int c = getopt(argc, argv, "s:");
-    int size;
+static void parse_options(int argc, char *argv[]) {
+    int c;
 
-    if (c == 's') {
-        size = atoi(optarg);
+    while ((c = getopt(argc, argv, "s:")) != -1) {
+        switch (c) {
+            case 's':
+                size = (int) strtol(optarg, NULL, 10);
+
+                if (SIZE_VALID) {
+                    printf("%s: invalid size: '%s'\n", PROGRAM_NAME, optarg);
+                    exit(EXIT_FAILURE);
+                }
+
+                break;
+            default:
+                printf("%s: usage: %s [-s size]\n", PROGRAM_NAME, PROGRAM_NAME);
+                exit(EXIT_FAILURE);
+        }
     }
+}
 
-    if (c == -1 || size < 1 || size > MAX_SIZE) {
+int main(int argc, char *argv[]) {
+    PROGRAM_NAME = argv[0];
+    parse_options(argc, argv);
+
+    if (SIZE_VALID) {
         size = MAX_SIZE;    
     }
 
@@ -204,5 +225,5 @@ int main(int argc, char *argv[]) {
     food_del(&f);
 
     view_end();
-    return 0;
+    return EXIT_SUCCESS;
 }
